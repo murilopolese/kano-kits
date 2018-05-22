@@ -1,5 +1,5 @@
 const MSK = require('../msk.js');
-let myMsk = new MSK({path: '/dev/tty.usbmodem14211'});
+let myMsk = new MSK({path: '/dev/ttyUSB0'});
 myMsk.connect()
 .then((msk) => {
     console.log('my msk connected');

@@ -14,7 +14,7 @@ Kano.listConnectedDevices()
                 console.log('something went wrong', data);
                 throw new Error(data.error);
             }
-            console.log('device info', data.value);;
+            console.log('device info', data.value);
         });
 })
 .catch((error) => {

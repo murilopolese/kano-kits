@@ -1,12 +1,12 @@
 {
   "name": "kano-hardware",
   "version": "1.0.0",
-  "description": "",
+  "description": "Library to interact with Kano kits without Kano Code",
   "main": "kano-kits.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "Murilo Polese <murilopolese@gmail.com>",
   "license": "ISC",
   "dependencies": {
     "serialport": "^6.2.0",
