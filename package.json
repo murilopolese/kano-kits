@@ -1,5 +1,5 @@
 {
-  "name": "kano-hardware",
+  "name": "kano-kits",
   "version": "1.0.0",
   "description": "Library to interact with Kano kits without Kano Code",
   "main": "kano-kits.js",
