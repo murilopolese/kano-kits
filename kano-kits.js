@@ -1,6 +1,13 @@
 const SerialPort = require('serialport');
 const MotionSensor = require('./msk.js');
 
+/**
+ * Request all the connected Kano devices. It resolves the promise with an array
+ * of classes representing the connected devices and ready to use (no need to
+ * connect or configure).
+ *
+ * @return {Promise}
+ */
 let listConnectedDevices = () => {
     return SerialPort.list()
     .then((ports) => {
