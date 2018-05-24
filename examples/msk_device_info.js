@@ -11,12 +11,8 @@ Kano.listConnectedDevices()
         console.log('No Motion Sensor Kit found');
         return;
     }
-    msk.getDeviceInfo()
+    return msk.getDeviceInfo()
         .then((data) => {
-            if (data.error) {
-                console.log('something went wrong', data);
-                throw new Error(data.error);
-            }
             console.log('device info', data.value);
         });
 })

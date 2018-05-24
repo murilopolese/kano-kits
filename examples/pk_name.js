@@ -11,10 +11,15 @@ Kano.listConnectedDevices()
         return;
     }
     // rpk.on('data', (d) => console.log('data', d))
-    return rpk.getDeviceInfo()
+    let rpkName = 'My Pixel Kit ' + parseInt(Math.random()*100);
+    console.log('Setting Pixel Kit name to', rpkName);
+    rpk.setName(rpkName)
         .then((data) => {
-            console.log('device info', data.value);
-        });
+            return rpk.getName();
+        })
+        .then((data) => {
+            console.log('Pixel kit name is set to', data.value.name);
+        })
 })
 .catch((error) => {
     console.log('error', error);

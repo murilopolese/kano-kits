@@ -10,21 +10,14 @@ Kano.listConnectedDevices()
         console.log('No Motion Sensor Kit found');
         return;
     }
+    // msk.on('data', (data) => console.log(data));
     msk.setMode('proximity')
         .then((data) => {
-            if (data.error) {
-                console.log('something went wrong', data);
-                throw new Error(data.error);
-            }
             console.log('msk is on proximity mode');
             msk.on('proximity', (data) => {
                 console.log('proximity', data);
             });
         });
-    msk.on('data', (data) => {
-        // All data msk is sending
-        // console.log('on data', data);
-    });
 })
 .catch((error) => {
     console.log('error', error);

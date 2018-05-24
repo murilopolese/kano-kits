@@ -10,11 +10,16 @@ Kano.listConnectedDevices()
         console.log('No Pixel Kit found');
         return;
     }
-    // rpk.on('data', (d) => console.log('data', d))
-    return rpk.getDeviceInfo()
-        .then((data) => {
-            console.log('device info', data.value);
-        });
+    // rpk.on('data', (d) => console.log('data', d));
+    // rpk.on('error-message', (d) => console.log('error', d));
+
+    setInterval(() => {
+        let frame = [];
+        for (let i = 0; i < 128; i++) {
+            frame[i] = '#'+(Math.random()*0xFFFFFF<<0).toString(16);
+        }
+        rpk.streamFrame(frame);
+    }, 100);
 })
 .catch((error) => {
     console.log('error', error);

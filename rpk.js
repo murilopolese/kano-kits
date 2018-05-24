@@ -40,6 +40,15 @@ class PixelKit extends BaseRPCDevice {
                 // on the `data` properties.
                 if(data.type == 'event') {
                     switch (data.name) {
+                        case 'button-down':
+                            this.emit('button-down', data.detail['button-id']);
+                            break;
+                        case 'button-up':
+                            this.emit('button-up', data.detail['button-id']);
+                            break;
+                        case 'mode-change':
+                            this.emit('dial', data.detail['mode-id']);
+                            break;
                         case 'error':
                             this.emit('error-message', data.detail.msg);
                             break;
@@ -74,6 +83,33 @@ class PixelKit extends BaseRPCDevice {
             this.port.open();
         });
     }
+
+    hexToBase64Colors(element) {
+        // return colorsArray.map(element => {
+            let frameBuffer = new Buffer(element.length * 2, 0);
+
+            element.forEach((color, index) => {
+                let colorBin = new Buffer(2),
+                    rgb888,
+                    rgb565;
+
+                if (typeof color === "string" && color.length === 7 && /#[0-9a-f]{6}/i.test(color)) {
+                    rgb888 = parseInt(color.substring(1, 7), 16);
+                    //                blue                 green                  red
+                    rgb565 = (rgb888 & 0xF8) >> 3 | (rgb888 & 0xFC00) >> 5 | (rgb888 & 0xF80000) >> 8;
+
+                    colorBin.writeUInt16BE(rgb565, 0);
+                } else {
+                    // If the color is invalid, write black
+                    colorBin.writeUInt16BE(0x0000, 0);
+                }
+
+                colorBin.copy(frameBuffer, index * 2);
+            });
+            return frameBuffer.toString('base64');
+        // });
+    }
+
     /**
      * Sends an RPC request to request the current MSK info. The promise should
      * resolve with an object with `vendor`, `product` and `mode` as properties.
@@ -83,6 +119,45 @@ class PixelKit extends BaseRPCDevice {
     getDeviceInfo() {
         return this.rpcRequest('device-info', []);
     }
+
+    streamFrame(frame) {
+        let encodedFrame = this.hexToBase64Colors(frame);
+        return this.rpcRequest('lightboard:on', [{ map: encodedFrame }]);
+    }
+    setName(name) {
+        return this.rpcRequest('set-name', [name]);
+    }
+    getName() {
+        return this.rpcRequest('get-name', []);
+    }
+    getBatteryStatus() {
+        return this.rpcRequest('battery-status', []);
+    }
+    getWifiStatus() {
+        return this.rpcRequest('wifi-status', []);
+    }
+    scanWifi() {
+        return this.rpcRequest('wifi-scan', []);
+    }
+    getLastWifiError() {
+        return this.rpcRequest('wifi-last-error', []);
+    }
+    connectToWifi(ssid, password) {
+        return this.rpcRequest('wifi-connect', [ssid, password]);
+    }
+    
+    playTone(freq, duration) {}
+    isPlayingTone() {}
+    stopTone() {}
+    getMicThreshold() {}
+    setMicThreshold(level) {}
+
+    // disableOTGControl() {}
+    getAnimationConfig(modeId) {}
+    setAnimationConfit(name, modeId, frameCount, frameRate, coverUrl) {}
+    getMaxFrames() {}
+    eraseAnimation(modeId) {}
+    saveAnimationFrame(modeId, frameNumber, frame) {}
 }
 
 module.exports = PixelKit;

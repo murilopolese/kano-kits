@@ -11,10 +11,17 @@ Kano.listConnectedDevices()
         return;
     }
     // rpk.on('data', (d) => console.log('data', d))
-    return rpk.getDeviceInfo()
-        .then((data) => {
-            console.log('device info', data.value);
-        });
+
+    rpk.on('button-down', (data) => {
+        console.log('button pressed', data);
+    });
+    rpk.on('button-up', (data) => {
+        console.log('button released', data);
+    });
+
+    rpk.on('dial', (data) => {
+        console.log('dial changed', data);
+    });
 })
 .catch((error) => {
     console.log('error', error);

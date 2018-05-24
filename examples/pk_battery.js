@@ -11,10 +11,10 @@ Kano.listConnectedDevices()
         return;
     }
     // rpk.on('data', (d) => console.log('data', d))
-    return rpk.getDeviceInfo()
+    rpk.getBatteryStatus()
         .then((data) => {
-            console.log('device info', data.value);
-        });
+            console.log('Battery status', data.value);
+        })
 })
 .catch((error) => {
     console.log('error', error);
