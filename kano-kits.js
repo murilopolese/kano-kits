@@ -1,6 +1,10 @@
 const SerialPort = require('serialport');
 const MotionSensor = require('./msk.js');
-
+const PixelKit = require('./rpk.js');
+const vendorIds = {
+    '2341': 'msk',
+    '0403': 'rpk'
+};
 /**
  * Request all the connected Kano devices. It resolves the promise with an array
  * of classes representing the connected devices and ready to use (no need to
@@ -11,19 +15,27 @@ const MotionSensor = require('./msk.js');
 let listConnectedDevices = () => {
     return SerialPort.list()
     .then((ports) => {
-        // TODO: Filter other devices than Motion Sensor
+        let deviceTypes = Object.keys(vendorIds);
+
+        // Filter only ids that exist on the `vendorIds` dictionary
         let serialPorts = ports.filter((port) => {
-            return port.vendorId === '2341';
+            return vendorIds[port.vendorId];
         });
-        let paths = serialPorts.map((port) => {
-            return port.comName;
+
+        let devicesPromise = serialPorts.map((port) => {
+            switch(vendorIds[port.vendorId]) {
+                case 'msk':
+                    let msk = new MotionSensor({path: port.comName});
+                    return msk.connect();
+                    break;
+                case 'rpk':
+                    let rpk = new PixelKit({path: port.comName});
+                    return rpk.connect();
+                    break;
+                default:
+            }
         });
-        // TODO: Instantiate other devices than Motion Sensors
-        let motionSensors = paths.map((path) => {
-            let msk = new MotionSensor({path: path});
-            return msk.connect();
-        });
-        return Promise.all(motionSensors);
+        return Promise.all(devicesPromise);
     });
 }
 

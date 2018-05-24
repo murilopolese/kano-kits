@@ -2,11 +2,11 @@ const SerialPort = require('serialport');
 const createInterface = require('readline').createInterface;
 const BaseRPCDevice = require('./base-rpc-device.js');
 
-class MotionSensor extends BaseRPCDevice {
+class PixelKit extends BaseRPCDevice {
     /**
      * Constructor for Motion Sensor class
      *
-     * @param {Object} options Options for Motion Sensor class. It should
+     * @param {Object} options Options for Pixek Kit class. It should
      *      contain at least a property with `path`.
      */
     constructor(options) {
@@ -28,6 +28,7 @@ class MotionSensor extends BaseRPCDevice {
      */
     bindEvents() {
         // Handles everything the serial port sends.
+        // this.port.on('data', (d) => {
         this.lineReader.on('line', (d) => {
             try {
                 // The data will come as a serialized/stringified json, therefore
@@ -39,12 +40,6 @@ class MotionSensor extends BaseRPCDevice {
                 // on the `data` properties.
                 if(data.type == 'event') {
                     switch (data.name) {
-                        case 'proximity-data':
-                            this.emit('proximity', data.detail.proximity);
-                            break;
-                        case 'gesture':
-                            this.emit('gesture', data.detail.type);
-                            break;
                         case 'error':
                             this.emit('error-message', data.detail.msg);
                             break;
@@ -52,14 +47,9 @@ class MotionSensor extends BaseRPCDevice {
                     }
                 }
             } catch (e) {
-                console.log('error', e.message);
+                this.emit('error-message', e.message)
             }
         });
-
-        // Print error messages
-        // this.on('error-message', (msg) => {
-        //     console.log('error message:', msg);
-        // })
 
         // Writes/sends something to the serial port
         this.on('send', (data) => {
@@ -85,26 +75,6 @@ class MotionSensor extends BaseRPCDevice {
         });
     }
     /**
-     * Sends an RPC request to set the MSK mode.
-     *
-     * @param {String} mode Mode to set on the MSK. It could be either
-     *      `proximity` or `gesture`.
-     * @return {Promise}
-     */
-    setMode(mode) {
-        return this.rpcRequest('set-mode', [{mode: mode}]);
-    }
-    /**
-     * Sends an RPC request to set the MSK data polling interval.
-     *
-     * @param {Number} inteval How often should the MSK ask the hardware sensor
-     *      for information (in milliseconds).
-     * @return {Promise}
-     */
-    setInterval(interval) {
-        return this.rpcRequest('set-interval', [{interval: interval}]);
-    }
-    /**
      * Sends an RPC request to request the current MSK info. The promise should
      * resolve with an object with `vendor`, `product` and `mode` as properties.
      *
@@ -113,6 +83,6 @@ class MotionSensor extends BaseRPCDevice {
     getDeviceInfo() {
         return this.rpcRequest('device-info', []);
     }
-};
+}
 
-module.exports = MotionSensor;
+module.exports = PixelKit;

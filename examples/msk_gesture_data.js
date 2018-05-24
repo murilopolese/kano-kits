@@ -3,11 +3,13 @@ const MotionSensor = require('../msk.js');
 Kano.listConnectedDevices()
 .then((devices) => {
     console.log(devices.length, 'devices found');
-    if (devices.length == 0 || !(devices[0] instanceof MotionSensor)) {
+    let msk = devices.find((device) => {
+        return device instanceof MotionSensor;
+    });
+    if (!msk) {
         console.log('No Motion Sensor Kit found');
         return;
     }
-    msk = devices[0];
     msk.setMode('gesture')
         .then((data) => {
             if (data.error) {

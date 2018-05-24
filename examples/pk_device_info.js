@@ -1,17 +1,17 @@
 const Kano = require('../kano-kits.js');
-const MotionSensor = require('../msk.js');
-
+const PixelKit = require('../rpk.js');
 Kano.listConnectedDevices()
 .then((devices) => {
     console.log(devices.length, 'devices found');
-    let msk = devices.find((device) => {
-        return device instanceof MotionSensor;
+    let rpk = devices.find((device) => {
+        return device instanceof PixelKit;
     });
-    if (!msk) {
+    if (!rpk) {
         console.log('No Motion Sensor Kit found');
         return;
     }
-    msk.getDeviceInfo()
+    // rpk.on('data', (d) => console.log('data', d))
+    rpk.getDeviceInfo()
         .then((data) => {
             if (data.error) {
                 console.log('something went wrong', data);
