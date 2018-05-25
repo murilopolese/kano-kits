@@ -18,7 +18,10 @@ Kano.listConnectedDevices()
         for (let i = 0; i < 128; i++) {
             frame[i] = '#'+(Math.random()*0xFFFFFF<<0).toString(16);
         }
-        rpk.streamFrame(frame);
+        rpk.streamFrame(frame)
+            .catch((error) => {
+                console.log('stream frame error', error.message);
+            });
     }, 100);
 })
 .catch((error) => {

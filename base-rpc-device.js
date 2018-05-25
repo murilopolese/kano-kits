@@ -1,7 +1,7 @@
 const EventEmitter = require('events');
 const uuid = require('uuid');
 
-class BaseRPCDevice extends EventEmitter{
+class BaseRPCDevice extends EventEmitter {
     constructor() {
         super();
         // When the data is an `rpc-response`, creates a custom event on
@@ -64,11 +64,12 @@ class BaseRPCDevice extends EventEmitter{
             let rpcResponseHandler = (data) => {
                 if(data.id == requestObject.id) {
                     this.removeListener('rpc-response', rpcResponseHandler);
-                    if(data.error) {
-                        reject(new Error(data.error));
-                    } else {
-                        resolve(data);
+                    if (data.err) {
+                        this.emit('error-message', data.err);
+                        reject(new Error(data.err));
+                        return;
                     }
+                    resolve(data);
                 }
             };
             this.on('rpc-response', rpcResponseHandler);

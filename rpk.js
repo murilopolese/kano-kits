@@ -1,4 +1,5 @@
 const SerialPort = require('serialport');
+const WebSocket = require('ws');
 const createInterface = require('readline').createInterface;
 const BaseRPCDevice = require('./base-rpc-device.js');
 
@@ -10,23 +11,24 @@ class PixelKit extends BaseRPCDevice {
      *      contain at least a property with `path`.
      */
     constructor(options) {
-        if (!options.path) {
-            throw new Error('Path is required');
+        if (!options.path && !options.ip) {
+            throw new Error('Path or ip address are required');
         }
         super();
-        this.port = new SerialPort(options.path, {
-            baudRate: 115200,
-            autoOpen: false
-        });
-        this.lineReader = createInterface({
-            input: this.port
-        });
+        if (options.path) {
+            this.port = new SerialPort(options.path, {
+                baudRate: 115200,
+                autoOpen: false
+            });
+            this.lineReader = createInterface({
+                input: this.port
+            });
+        } else if (options.ip) {
+            console.log('connecting over websocket');
+            this.ip = options.ip;
+        }
     }
-    /**
-     * Binds events from serial port to internal event emitter (bus) and from
-     * the event emitter to the serial port.
-     */
-    bindEvents() {
+    bindSerialEvents() {
         // Handles everything the serial port sends.
         // this.port.on('data', (d) => {
         this.lineReader.on('line', (d) => {
@@ -59,11 +61,86 @@ class PixelKit extends BaseRPCDevice {
                 this.emit('error-message', e.message)
             }
         });
-
         // Writes/sends something to the serial port
         this.on('send', (data) => {
             this.port.write(Buffer.from(data));
         });
+    }
+    bindWebSocketEvents() {
+        this.ws.on('message', (d) => {
+            try {
+                // The data will come as a serialized/stringified json, therefore
+                // we must parse it to get it's values.
+                let data = JSON.parse(d.toString());
+                // Proxy the `data` event to internal event emitter.
+                this.emit('data', data);
+                // Creates specific events on the internal event emitter based
+                // on the `data` properties.
+                if(data.type == 'event') {
+                    switch (data.name) {
+                        case 'button-down':
+                            this.emit('button-down', data.detail['button-id']);
+                            break;
+                        case 'button-up':
+                            this.emit('button-up', data.detail['button-id']);
+                            break;
+                        case 'mode-change':
+                            this.emit('dial', data.detail['mode-id']);
+                            break;
+                        case 'error':
+                            this.emit('error-message', data.detail.msg);
+                            break;
+                        default:
+                    }
+                }
+            } catch (error) {
+                this.emit('error-message', e.message)
+            }
+        });
+        // Writes/sends something to the serial port
+        this.on('send', (data) => {
+            this.ws.send(Buffer.from(data))
+        });
+    }
+    connectToSerial() {
+        return new Promise((resolve, reject) => {
+            this.port.on('open', (err) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                this.bindSerialEvents();
+                resolve(this);
+            });
+            this.port.open();
+        });
+    }
+    connectToWebSocket() {
+        return new Promise((resolve, reject) => {
+            this.ws = new WebSocket(`ws://${this.ip}:9998`);
+            this.ws.on('open', (err) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                this.bindWebSocketEvents();
+                resolve(this);
+            });
+            // this.ws.open();
+        });
+    }
+    /**
+     * Binds events from serial port to internal event emitter (bus) and from
+     * the event emitter to the serial port.
+     */
+    bindEvents() {
+        if (this.port) {
+            this.bindSerialEvents();
+        } else if (this.ip) {
+            this.bindWebSocketEvents();
+        } else {
+            console.log('No connection found');
+        }
     }
     /**
      * Opens the serial port and call `bindEvents`
@@ -71,17 +148,14 @@ class PixelKit extends BaseRPCDevice {
      * @return {Promise}
      */
     connect() {
-        return new Promise((resolve, reject) => {
-            this.port.on('open', (err) => {
-                if (err) {
-                    reject(err);
-                    return;
-                }
-                this.bindEvents();
-                resolve(this);
-            });
-            this.port.open();
-        });
+        if (this.port) {
+            return this.connectToSerial();
+        } else if (this.ip) {
+            return this.connectToWebSocket();
+        } else {
+            console.log('No connection found');
+            return Promise.reject();
+        }
     }
 
     hexToBase64Colors(element) {
@@ -117,7 +191,6 @@ class PixelKit extends BaseRPCDevice {
     getDeviceInfo() {
         return this.rpcRequest('device-info', []);
     }
-
     // frame must be an array with 128 hexadecimal colors prefixed with a `#`
     streamFrame(frame) {
         let encodedFrame = this.hexToBase64Colors(frame);
