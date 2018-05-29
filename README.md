@@ -2,6 +2,16 @@
 
 Node js modules for interacting with your favourite Kano kits!
 
+## Installing and running examples
+
+1. Clone this repo: `git clone git@github.com:murilopolese/kano-kits.git`
+1. Navigate to the folder: `cd kano-kits`
+1. Install dependencies: `npm install` (this might take a while)
+1. Connect your Motion Sensor or turn the Pixel Kit on and connect to the computer
+1. Run an example:
+    - For Motion Sensor: `node examples/msk_proximity_data.js`
+    - For Pixel Kit: `node examples/pk_stream_frame.js`
+
 ## Kano Kits
 
 The Kano Kits library offers a static method for you to list all the devices:
