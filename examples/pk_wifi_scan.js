@@ -12,16 +12,11 @@ Kano.listConnectedDevices()
         return;
     }
     // rpk.on('data', (d) => console.log('data', d))
-    let rpkName = 'My Pixel Kit ' + parseInt(Math.random()*100);
-    console.log('Setting Pixel Kit name to', rpkName);
-    rpk.setName(rpkName)
+    return rpk.scanWifi()
         .then((data) => {
-            return rpk.getName();
-        })
-        .then((data) => {
-            console.log('Pixel kit name is set to', data.value.name);
-        })
+            console.log('Those are the available wifi', data.value);
+        });
 })
 .catch((error) => {
-    console.log('error', error);
+    console.log('error', error.message);
 });

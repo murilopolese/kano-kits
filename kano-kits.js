@@ -40,5 +40,7 @@ let listConnectedDevices = () => {
 }
 
 module.exports = {
-    listConnectedDevices: listConnectedDevices
+    listConnectedDevices: listConnectedDevices,
+    PixelKit: PixelKit,
+    MotionSensor: MotionSensor
 }

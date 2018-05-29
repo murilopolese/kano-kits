@@ -1,5 +1,6 @@
 const Kano = require('../kano-kits.js');
-const PixelKit = require('../rpk.js');
+const PixelKit = Kano.PixelKit;
+
 Kano.listConnectedDevices()
 .then((devices) => {
     console.log(devices.length, 'devices found');
@@ -11,22 +12,9 @@ Kano.listConnectedDevices()
         return;
     }
     // rpk.on('data', (d) => console.log('data', d))
-    return rpk.getWifiStatus()
-        .then((data) => {
-            console.log('Wifi status', data.value);
-            return rpk.getLastWifiError()
-        })
-        .then((data) => {
-            console.log('Last wifi error', data);
-            return rpk.scanWifi();
-        })
-        .then((data) => {
-            console.log('Those are the available wifi', data.value);
-            return rpk.connectToWifi('Kano Legacy', 'XXX');
-        })
+    return rpk.connectToWifi('Kano Network', 'password')
         .then((data) => {
             console.log('Connected to wifi network', data.value);
-            return rpk.getWifiStatus();
         });
 })
 .catch((error) => {

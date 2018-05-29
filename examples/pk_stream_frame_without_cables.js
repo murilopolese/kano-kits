@@ -4,7 +4,7 @@ const PixelKit = require('../rpk.js');
 const rpk = new PixelKit({ip: '10.0.30.65'});
 rpk.connect()
     .then((data) => {
-        console.log('hell yeah');
+        console.log('Look mom! No cables! Yeah!');
         // rpk.on('data', (data) => { console.log('data', data ) });
         // rpk.on('error-message', (data) => { console.log('error-message', data ) });
         setInterval(() => {
@@ -20,4 +20,4 @@ rpk.connect()
     })
     .catch((error) => {
         console.log('error', error.message);
-    })
+    });

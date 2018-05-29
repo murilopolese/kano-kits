@@ -1,5 +1,6 @@
 const Kano = require('../kano-kits.js');
-const MotionSensor = require('../msk.js');
+const MotionSensor = Kano.MotionSensor;
+
 Kano.listConnectedDevices()
 .then((devices) => {
     console.log(devices.length, 'devices found');

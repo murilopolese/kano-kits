@@ -1,4 +1,4 @@
-const MSK = require('../msk.js');
+const MSK = require('../kano-kits.js').MotionSensor;
 let myMsk = new MSK({path: '/dev/ttyUSB0'});
 myMsk.connect()
 .then((msk) => {

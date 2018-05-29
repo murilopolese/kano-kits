@@ -1,5 +1,6 @@
 const Kano = require('../kano-kits.js');
-const PixelKit = require('../rpk.js');
+const PixelKit = Kano.PixelKit;
+
 Kano.listConnectedDevices()
 .then((devices) => {
     console.log(devices.length, 'devices found');
