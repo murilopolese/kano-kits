@@ -1,5 +1,6 @@
 from kano.serialconnection import SerialConnection
 from kano.rpc import RPC
+import base64
 
 class PixelKit():
 	connection = None
@@ -16,29 +17,41 @@ class PixelKit():
 		self.rpc = RPC(self.connection)
 		self.rpc.open()
 	
+	def hexToBase64(self, colors):
+		result = ''
+		for color in colors:
+			hex_color = color[1:]
+			base64_color = base64.b64encode(hex_color.encode())
+			result += base64_color.decode()
+		return result
+	
 	def get_device_info(self):
-		return self.rpc.request('device-info', [])
+		return self.rpc.request('device-info')
 
 	def stream_frame(self, frame):
-		pass
+		encoded_frame = self.hexToBase64(frame)
+		return self.rpc.request(
+			'lightboard:on',
+			[{'map': encoded_frame}]
+		)
 	
 	def set_name(self, name):
 		return self.rpc.request('set-name', name)
 	
 	def get_name(self):
-		return self.rpc.request('get-name', [])
+		return self.rpc.request('get-name')
 		
 	def get_battery_status(self):
-		return self.rpc.request('battery-status', [])
+		return self.rpc.request('battery-status')
 	
 	def get_wifi_status(self):
-		return self.rpc.request('wifi-status', [])
+		return self.rpc.request('wifi-status')
 	
 	def scan_wifi(self):
-		return self.rpc.request('wifi-scan', [])
+		return self.rpc.request('wifi-scan')
 	
 	def get_last_wifi_error(self):
-		return self.rpc.request('wifi-last-error', [])
+		return self.rpc.request('wifi-last-error')
 	
 	def connect_to_wifi(self, ssid, password):
 		return self.rpc.request('wifi-connect', [ssid, password])
@@ -50,13 +63,13 @@ class PixelKit():
 		)
 	
 	def is_playing_tone(self):
-		return self.rpc.request('is-playing-tone', [])
+		return self.rpc.request('is-playing-tone')
 	
 	def stop_tone(self):
-		return self.rpc.request('stop-tone', [])
+		return self.rpc.request('stop-tone')
 
 	def get_mic_threshold(self):
-		return self.rpc.request('get-mic-threshold', [])
+		return self.rpc.request('get-mic-threshold')
 	
 	def set_mic_threshold(self, level, minimum, maximum):
 		if level == 'custom':
