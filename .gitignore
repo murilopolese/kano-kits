@@ -1,4 +1,10 @@
 .DS_Store
-node_modules
 *.log
+<<<<<<< HEAD
 .env
+=======
+__pycache__
+*.pyc
+.env
+test.py
+>>>>>>> 237b380181d8dd610808597e797534521d59e091
