@@ -10,7 +10,7 @@ class RPC():
 			self.connection = connection
 		else:
 			raise ValueError('connection must be provided')
-			
+
 	def on_data(self, data):
 		if data['type'] == 'rpc-response' and data['err'] == 0:
 			rId = data['id']
@@ -19,14 +19,14 @@ class RPC():
 				self.promises.pop(rId, None)
 		elif data['type'] == 'rpc-response' and data['err'] != 0:
 			self.on_error(data)
-	
+
 	def on_error(self, data):
 		print('error', data)
-	
+
 	def open(self):
 		self.connection.on_data = self.on_data
 		self.connection.open()
-	
+
 	def get_request_object(self, method, params=[]):
 		return {
 			'type': 'rpc-request',
@@ -34,14 +34,14 @@ class RPC():
 			'method': method,
 			'params': params
 		}
-	
+
 	def get_request_string(self, request_object):
 		request_string = json.dumps(
 			request_object, separators=(',', ':')
 		)
 		return request_string + '\r\n'
 
-	def request(self, method, params):
+	def request(self, method, params=[]):
 		request_object = self.get_request_object(method, params)
 		request_id = request_object['id']
 		request_string = self.get_request_string(request_object)
@@ -52,4 +52,3 @@ class RPC():
 			}
 			self.connection.write(request_string)
 		return Promise(resolver)
-		

@@ -1,17 +1,5 @@
-import ardurpc
-from ardurpc.connector import Serial
+from kano.rpk import PixelKit
 
-con = Serial("/dev/tty.usbserial-DN049LCL", 115200)
-rpc = ardurpc.ArduRPC(connector=con)
+pk = PixelKit('/dev/tty.usbserial-DN049LCL')
 
-print("Version(Protocol): {0}".format(rpc.getProtocolVersion()))
-print(
-    "Version(Library): {0}".format(
-        ".".join([str(i) for i in rpc.getLibraryVersion()])
-    )
-)
-print(
-    "Available handlers: {0}".format(
-        ", ".join(rpc.get_handler_names())
-    )
-)
+pk.get_device_info().then(print)
